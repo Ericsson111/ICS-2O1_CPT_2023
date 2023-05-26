@@ -5,10 +5,10 @@ import random
 
 random.seed()
 # Asks player for their name 
-playerName = input("Elder: Brave traveler! What is thy name? ")
+#playerName = input("Elder: Brave traveler! What is thy name? ")
 
 # Display Welcome Message to the Player
-print("Elder: Welcome " + playerName + "!\n\tTo the enchanting realm of Elysium!\n\tPrepare to embark on a thrilling adventure where danger lurks at every turn.\n\tBrace yourself for an extraordinary journey into the unknown.\n")
+#print("Elder: Welcome " + playerName + "!\n\tTo the enchanting realm of Elysium!\n\tPrepare to embark on a thrilling adventure where danger lurks at every turn.\n\tBrace yourself for an extraordinary journey into the unknown.\n")
 print("-"*75)
 
 # Game Status 
@@ -34,11 +34,28 @@ gameMap = {"Village": {"n": "Treasure Room", "e": "Forest"},
            "Cave": {"w": "Treasure Room", "s": "South"},
            "Forest": {"n": "Cave", "w": "Village"},
            "Treasure Room": {"s": "Village", 'e': "Cave"}}
+           
+def displayGameMap():
+    print(colors.fg.yellow + "-----------Map-----------")
+    if currentLocation == "Village":
+        print("| Treasure Room\t Cave   |\n|\t\t        |") 
+        print("|\t\t        |\n|    Village\tForest  |\n|\tX\t\t|")
+    elif currentLocation == "Treasure Room":
+        print("| Treasure Room\t Cave   |\n|\tX\t        |") 
+        print("|\t\t        |\n|    Village\tForest  |\n|\t\t\t|")
+    elif currentLocation == "Cave":
+        print("| Treasure Room\t Cave   |\n|\t\t  X     |") 
+        print("|\t\t        |\n|    Village\tForest  |\n|\t\t\t|")
+    elif currentLocation == "Forest":
+        print("| Treasure Room\t Cave   |\n|\t\t        |") 
+        print("|\t\t        |\n|    Village\tForest  |\n|\t\t  X     |")
+    print("-"*25)
 
 def exploration(location):
     global currentLocation
     print(colors.fg.yellow + "You are current at the " + currentLocation)
     npcDialogue()
+    displayGameMap()
     while True:
         travelDirection = inputTravelDirection() # Validate travelling direction
         if travelDirection in [direction for direction in gameMap[currentLocation].keys()]:
@@ -52,7 +69,7 @@ def exploration(location):
                 print("You are currently at the " + currentLocation + "!" + colors.reset)
                 break
         else:
-            print(colors.fg.red + "(Forbidden Area)" + colors.reset)
+            print(colors.fg.red + "(Forgotten Forest is Unreachable)" + colors.reset)
             
     if currentLocation == "Treasure Room": # Fighting occurs 100% in Treasure room
         print(colors.reset + "-" * 75)
@@ -281,14 +298,14 @@ def npcDialogue():
     npcSpeaker = [person for person in npcDialogueDict.keys()][npcSpeakerID]
     speakerMessage = [message for message in npcDialogueDict[npcSpeaker]][random.randint(0, 1)]
     print(colors.fg.yellow + npcSpeaker + ": " + speakerMessage)
-    playerResponse = inputIntegerBetween(colors.reset + "Response:\n\t" + "1. " + npcDialogueDict[npcSpeaker][speakerMessage][0] + "\n\t2. " + npcDialogueDict[npcSpeaker][speakerMessage][1] + "\n\t3. Leave\n", 1, 2)
+    playerResponse = inputIntegerBetween(colors.reset + "Response:\n\t" + "1. " + npcDialogueDict[npcSpeaker][speakerMessage][0] + "\n\t2. " + npcDialogueDict[npcSpeaker][speakerMessage][1] + "\n\t3. (Leave)\n", 1, 3)
     if playerResponse == 1:
         print(npcDialogueDict[npcSpeaker][speakerMessage][0])
     elif playerResponse == 2:
         print(npcDialogueDict[npcSpeaker][speakerMessage][1])
     elif playerResponse == 3:
-        print(colors.fg.yellow + "(You left without saying a word...)" + colors.reset)
-
+        print(colors.fg.yellow + "(You left without saying a word...)\n" + colors.reset)
+    # Talk until player decide to leave
 def mathQuiz():
     global playerElysiumShards
     total_question = 5
