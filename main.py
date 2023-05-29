@@ -5,10 +5,10 @@ import random
 
 random.seed()
 # Asks player for their name 
-#playerName = input("Elder: Brave traveler! What is thy name? ")
+playerName = input("Elder: Brave traveler! What is thy name? ")
 
 # Display Welcome Message to the Player
-#print("Elder: Welcome " + playerName + "!\n\tTo the enchanting realm of Elysium!\n\tPrepare to embark on a thrilling adventure where danger lurks at every turn.\n\tBrace yourself for an extraordinary journey into the unknown.\n")
+print("Elder: Welcome " + playerName + "!\n\tTo the enchanting realm of Elysium!\n\tPrepare to embark on a thrilling adventure where danger lurks at every turn.\n\tBrace yourself for an extraordinary journey into the unknown.\n")
 print("-"*75)
 
 # Game Status 
@@ -20,7 +20,7 @@ shopOnGoing = True
 # Player Status 
 playerHealthPoint = 100 
 playerElysiumShards = 2000
-playerExperienceLevel = 65
+playerExperienceLevel = 0
 playerKillCount = 0
 
 # Player Inventory
@@ -28,6 +28,22 @@ playerWeapon = "Wooden Sword"
 playerArmour = "Leather Armour"
 playerPotion = "Healing Potion"
 playerAbility = "Fire"
+
+# Experience Level 
+experienceLevelRequirements = {0: 0, 10: 1, 20: 15, 30: 25, 40: 35, 50: 45}
+
+def getExperienceLevel(killCount):
+    global playerExperienceLevel
+    for level, kill in experienceLevelRequirements.items():
+        if killCount < kill:
+            return level - 10 
+    if playerExperienceLevel != max(experienceLevelRequirements.keys()):
+        print(colors.fg.yellow + "Congratulations Young Warrior! You're experience level has increased!")
+        print("Experience Level: " + str(playerExperienceLevel) + colors.reset)
+    playerExperienceLevel = max(experienceLevelRequirements.keys())
+    print(playerExperienceLevel)
+    
+getExperienceLevel(playerKillCount)
 
 # Map
 gameMap = {"Village": {"n": "Treasure Room", "e": "Forest"},
@@ -60,20 +76,20 @@ def exploration(location):
         travelDirection = inputTravelDirection() # Validate travelling direction
         if travelDirection in [direction for direction in gameMap[currentLocation].keys()]:
             secretNumber = random.randint(1, 10)
-            if random.randint(1, 10) == secretNumber: # 1/100 Chance to Fight
-                currentLocation = gameMap[location][travelDirection] # Modify player's current location 
+            currentLocation = gameMap[location][travelDirection] # Modify player's current location 
+            if currentLocation == "Treasure Room": # Fighting occurs 100% in Treasure room
+                print(colors.reset + "-" * 75)
+                combat()
+                break
+            elif random.randint(1, 10) == secretNumber: # 1/100 Chance to Fight
                 print("You are currently at the " + currentLocation + "!" + colors.reset)
                 combat() 
             else:
-                currentLocation = gameMap[location][travelDirection] # Modify player's current location 
                 print("You are currently at the " + currentLocation + "!" + colors.reset)
                 break
         else:
             print(colors.fg.red + "(Forgotten Forest is Unreachable)" + colors.reset)
             
-    if currentLocation == "Treasure Room": # Fighting occurs 100% in Treasure room
-        print(colors.reset + "-" * 75)
-        combat()
     
 def playerInventory():
     print(colors.fg.cyan + "-"*27)
@@ -161,6 +177,7 @@ def combatAttack(enemy): # Player Attacking
                 print("You earned 50 Elysium Shards" + colors.reset)
                 playerKillCount += 1
                 playerElysiumShards += 50
+                getExperienceLevel(playerKillCount)
             else:
                 print(colors.fg.red + "You Died" + colors.reset)
                 playerKillCount = 0 
@@ -201,6 +218,7 @@ def combatDefend(enemy): # Enemy Attacking
             print("You earned 50 Elysium Shards" + colors.reset)
             playerKillCount += 1
             playerElysiumShards += 50
+            getExperienceLevel(playerKillCount)
         else:
             print(colors.fg.red + "You Died" + colors.reset)
             playerKillCount = 0 
@@ -306,6 +324,7 @@ def npcDialogue():
     elif playerResponse == 3:
         print(colors.fg.yellow + "(You left without saying a word...)\n" + colors.reset)
     # Talk until player decide to leave
+    
 def mathQuiz():
     global playerElysiumShards
     total_question = 5
